@@ -1,0 +1,64 @@
+{
+  "hash": "faaed84d",
+  "configHash": "ccd5a468",
+  "lockfileHash": "cc10920c",
+  "browserHash": "1a3ae616",
+  "optimized": {
+    "react-dom/client": {
+      "src": "../../node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "bc6e9885",
+      "needsInterop": true
+    },
+    "react-router-dom": {
+      "src": "../../node_modules/react-router-dom/dist/index.mjs",
+      "file": "react-router-dom.js",
+      "fileHash": "cbfa1ba6",
+      "needsInterop": false
+    },
+    "react-tsparticles": {
+      "src": "../../node_modules/react-tsparticles/esm/index.js",
+      "file": "react-tsparticles.js",
+      "fileHash": "b37aed80",
+      "needsInterop": false
+    },
+    "react": {
+      "src": "../../node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "31a69266",
+      "needsInterop": true
+    },
+    "react/jsx-dev-runtime": {
+      "src": "../../node_modules/react/jsx-dev-runtime.js",
+      "file": "react_jsx-dev-runtime.js",
+      "fileHash": "b0c033fe",
+      "needsInterop": true
+    },
+    "tsparticles-slim": {
+      "src": "../../node_modules/tsparticles-slim/esm/index.js",
+      "file": "tsparticles-slim.js",
+      "fileHash": "07df3613",
+      "needsInterop": false
+    },
+    "tsparticles": {
+      "src": "../../node_modules/tsparticles/browser/index.js",
+      "file": "tsparticles.js",
+      "fileHash": "a0900804",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "esm-CZKWRZUG": {
+      "file": "esm-CZKWRZUG.js",
+      "isDynamicEntry": false
+    },
+    "react-TUYU05Ph": {
+      "file": "react-TUYU05Ph.js",
+      "isDynamicEntry": false
+    },
+    "react-dom-D9hyD8Iw": {
+      "file": "react-dom-D9hyD8Iw.js",
+      "isDynamicEntry": false
+    }
+  }
+}
