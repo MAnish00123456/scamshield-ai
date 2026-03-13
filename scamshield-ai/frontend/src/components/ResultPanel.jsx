@@ -1,45 +1,88 @@
-function ResultPanel() {
+function ResultPanel({ result }) {
+
+  if (!result) return null
+
+  const { risk_score } = result.analysis
+
+  const riskScore = (risk_score / 10).toFixed(1)
+  const safeScore = (10 - riskScore).toFixed(1)
+
+  const riskPercent = risk_score
+  const safePercent = 100 - risk_score
+
+  // const safeLevel =
+  // safeScore > 7 ? "Very Safe" :
+  // safeScore > 4 ? "Moderate Safety" :
+  // "Low Safety"
+
   return (
     <div className="result-section">
+
+      {/* RISK CARD */}
+
       <div className="result-card danger">
+
         <div className="risk-label">Risk Score</div>
+
         <div className="risk-score">
-          8.5<span className="denominator">/10</span>
+          {riskScore}
+          <span className="denominator">/10</span>
         </div>
+
         <div className="risk-bar-bg">
-          <div className="risk-bar-fill" style={{ width: '85%' }}></div>
+          <div
+            className="risk-bar-fill"
+            style={{ width: `${riskPercent}%` }}
+          ></div>
         </div>
-        <div style={{ marginTop: '12px' }}>
-          <span className="scam-type">OTP Fraud</span>
+
+        <div style={{ marginTop: "12px" }}>
+          <span className="scam-type">Scam Detected</span>
+
           <div className="explanation">
-            This message is asking for your OTP which is a classic bank fraud
-            technique. No real bank ever asks for OTP.
+            Suspicious scam patterns detected in the message.
           </div>
+
           <div className="advice">
-            Do NOT share your OTP. Block this number immediately.
+            Avoid clicking links or sharing personal information.
           </div>
         </div>
+
       </div>
 
+
+      {/* SAFE CARD */}
+
       <div className="result-card safe">
-        <div className="risk-label">Previous Scan</div>
+
+        <div className="risk-label">Safe Score</div>
+
         <div className="risk-score safe">
-          1.2<span className="denominator">/10</span>
+          {safeScore}
+          <span className="denominator">/10</span>
         </div>
+
         <div className="risk-bar-bg">
-          <div className="risk-bar-fill safe" style={{ width: '12%' }}></div>
+          <div
+            className="risk-bar-fill safe"
+            style={{ width: `${safePercent}%` }}
+          ></div>
         </div>
-        <div style={{ marginTop: '12px' }}>
-          <span className="scam-type safe">Safe</span>
+
+        <div style={{ marginTop: "12px" }}>
+          <span className="scam-type safe">Safety Level</span>
+
           <div className="explanation">
-            This appears to be a legitimate message from a verified sender. No
-            suspicious patterns detected.
+            Higher score means the message is more likely safe.
           </div>
+
           <div className="advice safe">
-            This message looks safe to respond to.
+            Always verify unknown links and offers.
           </div>
         </div>
+
       </div>
+
     </div>
   )
 }
