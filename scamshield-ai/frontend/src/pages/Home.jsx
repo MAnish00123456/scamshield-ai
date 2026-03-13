@@ -14,7 +14,6 @@ function Home() {
 
   return (
     <>
-
       <Navbar />
       <Hero />
 
@@ -24,12 +23,13 @@ function Home() {
       </section>
 
       <ResultPanel />
-      <ChatBot />
 
-      {/* ADD THESE */}
       <Reviews />
       <HowItWorks />
-      <FAQ/>
+      <FAQ />
+
+      {/* Floating chatbot widget */}
+      <ChatBot />
     </>
   )
 }
