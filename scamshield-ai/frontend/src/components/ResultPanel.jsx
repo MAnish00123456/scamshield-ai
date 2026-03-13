@@ -1,14 +1,13 @@
 function ResultPanel({ result }) {
 
-  if (!result) return null
+  if (!result?.analysis) return null
+  const risk_score = result?.analysis?.risk_score ?? 0
 
-  const { risk_score } = result.analysis
-
-  const riskScore = (risk_score / 10).toFixed(1)
-  const safeScore = (10 - riskScore).toFixed(1)
-
-  const riskPercent = risk_score
-  const safePercent = 100 - risk_score
+  const riskScore = risk_score.toFixed(1)
+  const safeScore = (10 - risk_score).toFixed(1)
+  
+  const riskPercent = risk_score * 10
+  const safePercent = 100 - riskPercent
 
   // const safeLevel =
   // safeScore > 7 ? "Very Safe" :
@@ -19,6 +18,7 @@ function ResultPanel({ result }) {
     <div className="result-section">
 
       {/* RISK CARD */}
+
 
       <div className="result-card danger">
 

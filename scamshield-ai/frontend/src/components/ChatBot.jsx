@@ -4,7 +4,7 @@ import { sendMessage } from '../services/chatService'
 const WELCOME_MSG = {
   role: 'assistant',
   content:
-    'Namaste! Got a suspicious message?\n\nPaste the text, link, or upload screenshot and I will analyze it for scams.',
+    'Namaste! Got a suspicious message?\n\nPaste the text and I will analyze it for scams.',
 }
 
 function ChatBot() {

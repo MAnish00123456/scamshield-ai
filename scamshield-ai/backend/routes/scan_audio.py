@@ -3,7 +3,7 @@ import shutil
 import os
 import uuid
 
-from services.ocr_service import detect_and_extract
+from services.speech_service import process_audio
 from services.ai_analysis import analyze_text_for_scam
 
 router = APIRouter()
@@ -13,31 +13,29 @@ UPLOAD_FOLDER = "temp"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 
-@router.post("/scan-image")
-async def scan_image(file: UploadFile = File(...)):
+@router.post("/scan-audio")
+async def scan_audio(file: UploadFile = File(...)):
 
     try:
 
-        # unique filename
         file_id = str(uuid.uuid4())
         file_ext = os.path.splitext(file.filename)[1]
+
         file_path = os.path.join(UPLOAD_FOLDER, file_id + file_ext)
 
-        # save file
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
-        # OCR or text extraction
-        extracted_text = detect_and_extract(file_path)
+        # speech → text
+        transcript = await process_audio(file_path)
 
-        # AI analysis
-        analysis_result = analyze_text_for_scam(extracted_text)
+        # AI scam detection
+        analysis = analyze_text_for_scam(transcript)
 
         return {
             "status": "success",
-            "file_type": file_ext,
-            "extracted_text": extracted_text[:500],
-            "analysis": analysis_result
+            "transcript": transcript,
+            "analysis": analysis
         }
 
     except Exception as e:

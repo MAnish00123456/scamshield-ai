@@ -1,5 +1,6 @@
 import { useRef, useState } from "react"
 import { scanImage } from "../imageScanService.js"
+import analyzeVoice from "../services/voiceService.js"
 import ResultPanel from "./ResultPanel"
 
 function UploadBox({ activeTab }) {
@@ -12,80 +13,125 @@ function UploadBox({ activeTab }) {
   const [preview, setPreview] = useState(null)
   const [scanResult, setScanResult] = useState(null)
 
+  const [isScanning, setIsScanning] = useState(false)
+  const [scanLocked, setScanLocked] = useState(false)
+
+  // FILE SELECT
   const handleFileChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
 
-      const file = e.target.files[0]
+    const file = e.target.files?.[0]
+    if (!file) return
 
-      setFileName(file.name)
-      setSelectedFile(file)
+    setFileName(file.name)
+    setSelectedFile(file)
+
+    // preview only for screenshots
+    if (activeTab === "screenshot") {
       setPreview(URL.createObjectURL(file))
-
+    } else {
+      setPreview(null)
     }
+
+    setScanResult(null)
+    setScanLocked(false)
   }
 
+  // DRAG DROP (image only)
   const handleDrop = (e) => {
+
     e.preventDefault()
 
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+    if (activeTab !== "screenshot") return
 
-      const file = e.dataTransfer.files[0]
+    const file = e.dataTransfer.files?.[0]
+    if (!file) return
 
-      setFileName(file.name)
-      setSelectedFile(file)
-      setPreview(URL.createObjectURL(file))
+    setFileName(file.name)
+    setSelectedFile(file)
+    setPreview(URL.createObjectURL(file))
 
-    }
+    setScanResult(null)
+    setScanLocked(false)
   }
 
-  const handleDragOver = (e) => {
-    e.preventDefault()
-  }
+  const handleDragOver = (e) => e.preventDefault()
 
   const removeFile = () => {
+
     setFileName("")
     setSelectedFile(null)
     setPreview(null)
+    setScanResult(null)
+    setScanLocked(false)
   }
 
-  const handleScan = async () => {
+  // IMAGE SCAN
+  const handleImageScan = async () => {
 
     if (!selectedFile) {
       alert("Please upload a screenshot first")
       return
     }
 
+    if (isScanning || scanLocked) return
+
     try {
+
+      setIsScanning(true)
 
       const result = await scanImage(selectedFile)
 
       setScanResult(result)
-
-      console.log("Scan Result:", result)
+      setScanLocked(true)
 
     } catch (error) {
 
-      console.error("Scan failed:", error)
+      console.error("Image scan failed:", error)
+
+    } finally {
+
+      setIsScanning(false)
 
     }
-
   }
 
+  // VOICE SCAN
+  const handleVoiceScan = async () => {
+
+    if (!selectedFile) {
+      alert("Please upload a voice file first")
+      return
+    }
+
+    try {
+
+      setIsScanning(true)
+
+      const result = await analyzeVoice(selectedFile)
+
+      setScanResult(result)
+
+    } catch (error) {
+
+      console.error("Voice scan failed:", error)
+
+    } finally {
+
+      setIsScanning(false)
+
+    }
+  }
+
+  // =========================
   // LINK TAB
+  // =========================
+
   if (activeTab === "link") {
+
     return (
       <div className="upload-box">
 
-        <div className="upload-icon">
-          <svg viewBox="0 0 24 24" fill="none" strokeWidth="2">
-            <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" />
-            <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" />
-          </svg>
-        </div>
-
         <h3>Paste a suspicious link</h3>
-
-        <p>We'll analyze the URL for phishing and malware indicators</p>
 
         <input
           type="text"
@@ -94,51 +140,93 @@ function UploadBox({ activeTab }) {
           placeholder="https://suspicious-link.com..."
         />
 
-        <button className="scan-btn">Check Link</button>
-
-      </div>
-    )
-  }
-
-  // VOICE TAB
-  if (activeTab === "voice") {
-    return (
-      <div className="upload-box">
-
-        <div className="upload-icon">
-          <svg viewBox="0 0 24 24" fill="none" strokeWidth="2">
-            <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" />
-            <path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8" />
-          </svg>
-        </div>
-
-        <h3>Upload a voice message</h3>
-
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="audio/*"
-          style={{ display: "none" }}
-          onChange={handleFileChange}
-        />
-
-        {fileName && <p>{fileName}</p>}
-
-        <button
-          className="scan-btn"
-          onClick={() => fileInputRef.current?.click()}
-        >
-          Upload & Analyze
+        <button className="scan-btn">
+          Check Link
         </button>
 
       </div>
     )
   }
 
+  // =========================
+  // VOICE TAB
+  // =========================
+
+if (activeTab === "voice") {
+
+  return (
+    <>
+
+      {!selectedFile ? (
+
+        <div
+          className="upload-box"
+          onClick={() => fileInputRef.current?.click()}
+          style={{ cursor: "pointer" }}
+        >
+
+          <h3>Upload a voice message</h3>
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".mp3,.wav,.m4a,.ogg"
+            style={{ display: "none" }}
+            onChange={handleFileChange}
+          />
+
+          <p>MP3, WAV, M4A supported — max 10MB</p>
+
+        </div>
+
+      ) : (
+
+        <div className="upload-box preview-mode">
+
+          <audio
+            controls
+            src={URL.createObjectURL(selectedFile)}
+          />
+
+          <div className="file-info">
+
+            <span className="file-name">{fileName}</span>
+
+            <button
+              className="remove-btn"
+              onClick={removeFile}
+            >
+              Remove
+            </button>
+
+          </div>
+
+          <button
+            className="scan-btn"
+            onClick={handleVoiceScan}
+            disabled={isScanning}
+          >
+            {isScanning ? "Analyzing..." : "Analyze Voice"}
+          </button>
+
+        </div>
+
+      )}
+
+      {scanResult && <ResultPanel result={scanResult} />}
+
+    </>
+  )
+}
+
+  // =========================
   // IMAGE TAB
+  // =========================
+
   return (
     <>
       {!preview ? (
+
         <div
           className="upload-box"
           onDrop={handleDrop}
@@ -147,26 +235,22 @@ function UploadBox({ activeTab }) {
           style={{ cursor: "pointer" }}
         >
 
-          <div className="upload-icon">
-            <svg viewBox="0 0 24 24" fill="none" strokeWidth="2">
-              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" />
-            </svg>
-          </div>
-
           <h3>Drop your screenshot here</h3>
 
-          <p>PNG, JPG, WEBP supported — max 10MB</p>
+          <p>PNG, JPG, WEBP, PDF supported — max 10MB</p>
 
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/*"
+            accept="image/*,.pdf"
             style={{ display: "none" }}
             onChange={handleFileChange}
           />
 
         </div>
+
       ) : (
+
         <div className="upload-box preview-mode">
 
           <img
@@ -190,12 +274,14 @@ function UploadBox({ activeTab }) {
 
           <button
             className="scan-btn"
-            onClick={handleScan}
+            onClick={handleImageScan}
+            disabled={isScanning}
           >
-            Scan Now
+            {isScanning ? "Scanning..." : "Scan Now"}
           </button>
 
         </div>
+
       )}
 
       {scanResult && <ResultPanel result={scanResult} />}
