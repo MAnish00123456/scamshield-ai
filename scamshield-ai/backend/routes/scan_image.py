@@ -29,6 +29,7 @@ async def scan_image(file: UploadFile = File(...)):
 
         # OCR or text extraction
         extracted_text = detect_and_extract(file_path)
+        print("OCR TEXT:", extracted_text)
 
         # AI analysis
         analysis_result = analyze_text_for_scam(extracted_text)

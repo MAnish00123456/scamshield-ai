@@ -1,9 +1,12 @@
 import re
+import socket
+import requests
 from urllib.parse import urlparse
 
 SUSPICIOUS_KEYWORDS = [
-    "login", "verify", "secure", "account", "update",
-    "bank", "payment", "confirm", "signin"
+"login","verify","secure","account","update",
+"bank","payment","confirm","signin",
+"refund","otp","registration","fee","dob"
 ]
 
 
@@ -60,6 +63,32 @@ def _build_explanation(url: str, features: dict) -> list:
     return reasons
 
 
+# ----------- NEW NETWORK CHECKS (SAFE ADDITION) -----------
+
+def _domain_exists(url: str) -> bool:
+    """Check if the domain resolves via DNS."""
+    try:
+        parsed = urlparse(url if "://" in url else "http://" + url)
+        domain = parsed.hostname
+        socket.gethostbyname(domain)
+        return True
+    except:
+        return False
+
+
+def _url_reachable(url: str):
+    """Check if the website responds to HTTP request."""
+    try:
+        if not url.startswith(("http://", "https://")):
+            url = "http://" + url
+        r = requests.get(url, timeout=4)
+        return r.status_code
+    except:
+        return None
+
+
+# ----------- MAIN ANALYSIS FUNCTION -----------
+
 def analyze_link(url: str) -> dict:
     from ai_models.url_classifier import predict_url
 
@@ -67,9 +96,66 @@ def analyze_link(url: str) -> dict:
     features = extract_url_features(url)
     explanation = _build_explanation(url, features)
 
+    risk_score = result.get("risk_score", 5.0)
+
+    parsed = urlparse(url if "://" in url else "http://" + url)
+    domain = parsed.hostname
+
+    # ---------------- DNS CHECK ----------------
+    domain_ok = _domain_exists(url)
+
+    if not domain_ok:
+        risk_score = max(risk_score, 9.0)
+        explanation.append("Domain DNS lookup failed — site likely does not exist")
+
+    # ---------------- HTTP CHECK ----------------
+    status = None
+    if domain_ok:
+        status = _url_reachable(url)
+
+        if status is None:
+            risk_score = max(risk_score, 8.0)
+            explanation.append("Website server not responding")
+
+        elif status >= 500:
+            risk_score = max(risk_score, 7.5)
+            explanation.append(f"Server error detected (HTTP {status})")
+
+        elif status >= 400:
+            risk_score = max(risk_score, 7.0)
+            explanation.append(f"Broken or suspicious endpoint (HTTP {status})")
+
+    # ---------------- EXTRA PHISHING HEURISTICS ----------------
+    if domain:
+        parts = domain.split(".")
+
+        # suspicious TLDs often used in phishing
+        suspicious_tlds = ["xyz", "top", "click", "gq", "tk", "work"]
+
+        if parts[-1] in suspicious_tlds:
+            risk_score = max(risk_score, 6.5)
+            explanation.append("Suspicious top-level domain")
+
+        # fake brand domains
+        brand_keywords = ["paypal", "amazon", "bank", "apple", "google"]
+
+        if any(b in domain.lower() for b in brand_keywords) and domain.count("-") >= 1:
+            risk_score = max(risk_score, 7.5)
+            explanation.append("Brand impersonation pattern detected")
+
+    risk_score = min(risk_score, 10.0)
+
+    # ---------------- FINAL VERDICT ----------------
+    if risk_score >= 7:
+        verdict = "fraud"
+    elif risk_score >= 4:
+        verdict = "suspicious"
+    else:
+        verdict = "safe"
+
     return {
-        "verdict": result["verdict"],
-        "confidence": result["confidence"],
-        "risk_score": result["risk_score"],
+        "verdict": verdict,
+        "confidence": result.get("confidence", 0.5),
+        "risk_score": risk_score,
         "explanation": explanation,
     }

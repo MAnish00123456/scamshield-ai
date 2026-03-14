@@ -27,7 +27,7 @@ Responsibilities:
 - Paste suspicious links
 - Display scam risk score
 - Display scam explanation
-- Show fraud heatmap visualization
+
 
 Important folders:
 
@@ -40,7 +40,7 @@ Key components:
 - ResultPanel.jsx
 - RiskMeter.jsx
 - ScannerTabs.jsx
-- HeatmapChart.jsx
+
 
 ---
 
@@ -55,7 +55,7 @@ Responsibilities:
 - Analyze scam patterns
 - Process voice messages
 - Detect phishing links
-- Provide fraud heatmap data
+- 
 
 Important folders:
 
@@ -69,7 +69,7 @@ Key backend files:
 - routes/scan_image.py
 - routes/scan_voice.py
 - routes/scan_link.py
-- routes/heatmap.py
+-
 
 ---
 
@@ -165,7 +165,6 @@ The system processes user inputs through the following pipeline:
 - Screenshot scam detection
 - Voice scam detection
 - Phishing link detection
-- Fraud heatmap visualization
 - Risk score analysis
 
 ---

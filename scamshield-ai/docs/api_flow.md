@@ -110,30 +110,6 @@ Response
 
 ---
 
-## 4. Scam Heatmap Data
-
-Endpoint
-
-GET /heatmap
-
-Purpose
-
-Return fraud activity data across regions.
-
-Response
-
-[
-  {
-    "state": "Maharashtra",
-    "cases": 80
-  },
-  {
-    "state": "Delhi",
-    "cases": 60
-  }
-]
-
-Frontend uses this data to render the fraud heatmap visualization.
 
 ---
 
