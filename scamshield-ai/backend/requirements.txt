@@ -1,7 +1,11 @@
 fastapi
 uvicorn
-pandas
-numpy
-scikit-learn
+pytesseract
+pillow
 python-multipart
+scikit-learn
+numpy
+pandas
+requests
 openai-whisper
+torch
