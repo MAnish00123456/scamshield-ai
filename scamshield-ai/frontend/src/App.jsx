@@ -16,8 +16,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/scanner" element={<ScannerPage />} />
-        {/* <Route path="/heatmap" element={<HeatmapPage />} /> */}
-      </Routes>
+        </Routes>
 
       {/* Footer */}
       <Footer />

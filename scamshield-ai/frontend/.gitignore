@@ -26,3 +26,6 @@ dist-ssr
 .vite/
 node_modules/
 dist/
+
+backend/temp/
+backend/requirements.txt
