@@ -16,7 +16,9 @@ async def scan_link(data: LinkRequest):
     result = analyze_link(data.url)
 
     return {
-        "status": "success",
         "url": data.url,
-        "analysis": result
+        "verdict": result["verdict"],
+        "confidence": result["confidence"],
+        "risk_score": result["risk_score"],
+        "explanation": result["explanation"],
     }

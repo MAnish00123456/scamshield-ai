@@ -2,9 +2,9 @@ import { Link, useLocation } from 'react-router-dom'
 
 const navItems = [
   // { label: 'Scanner', path: '/', section: 'scanner' },
-  { label: 'Link Check', path: '/', section: 'scanner' },
+  // { label: 'Link Check', path: '/', section: 'scanner' },
   // { label: 'Voice', path: '/', section: 'scanner' },
-  { label: 'Heatmap', path: '/heatmap' },
+  // { label: 'Heatmap', path: '/heatmap' },
   // { label: 'Chatbot', path: '/', section: 'chatbot' },
 ]
 

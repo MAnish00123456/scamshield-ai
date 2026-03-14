@@ -8,6 +8,8 @@ from routes.scan_link import router as scan_link_router
 from routes.heatmap import router as heatmap_router
 from routes.chat import router as chat_router
 
+from ai_models.url_classifier import load_url_model
+
 
 # Create FastAPI app
 app = FastAPI(
@@ -33,6 +35,12 @@ app.include_router(scan_audio_router, tags=["Audio Scan"])
 app.include_router(scan_link_router, tags=["Link Scan"])
 app.include_router(heatmap_router, tags=["Heatmap"])
 app.include_router(chat_router, tags=["Chat AI"])
+
+
+# Load URL phishing model at startup (trains if url_model.pkl missing)
+@app.on_event("startup")
+def startup_load_url_model():
+    load_url_model()
 
 
 # Root route

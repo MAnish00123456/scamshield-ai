@@ -3,8 +3,6 @@ import random
 
 router = APIRouter()
 
-# List of Indian states
-
 states = [
 "Delhi","Maharashtra","Uttar Pradesh","Bihar","West Bengal","Tamil Nadu",
 "Karnataka","Gujarat","Rajasthan","Madhya Pradesh","Punjab","Haryana",
@@ -13,15 +11,32 @@ states = [
 "Mizoram","Sikkim","Arunachal Pradesh"
 ]
 
+scam_types = [
+    "OTP Scam",
+    "KYC Scam",
+    "Lottery Scam",
+    "Job Scam",
+    "Investment Scam",
+    "Phishing Link"
+]
+
 @router.get("/heatmap")
 def get_heatmap():
+
     data = []
 
     for state in states:
+
         entry = {
-        "state": state,
-        "cases": random.randint(5,100)
-    }
-    data.append(entry)
+            "state": state,
+            "OTP Scam": random.randint(0,50),
+            "KYC Scam": random.randint(0,50),
+            "Lottery Scam": random.randint(0,50),
+            "Job Scam": random.randint(0,50),
+            "Investment Scam": random.randint(0,50),
+            "Phishing Link": random.randint(0,50)
+        }
+
+        data.append(entry)
 
     return data

@@ -1,7 +1,9 @@
 import { useRef, useState } from "react"
 import { scanImage } from "../imageScanService.js"
 import analyzeVoice from "../services/voiceService.js"
+import analyzeLink from "../services/linkService.js"
 import ResultPanel from "./ResultPanel"
+
 
 function UploadBox({ activeTab }) {
 
@@ -15,6 +17,7 @@ function UploadBox({ activeTab }) {
 
   const [isScanning, setIsScanning] = useState(false)
   const [scanLocked, setScanLocked] = useState(false)
+  
 
   // FILE SELECT
   const handleFileChange = (e) => {
@@ -25,7 +28,6 @@ function UploadBox({ activeTab }) {
     setFileName(file.name)
     setSelectedFile(file)
 
-    // preview only for screenshots
     if (activeTab === "screenshot") {
       setPreview(URL.createObjectURL(file))
     } else {
@@ -36,7 +38,7 @@ function UploadBox({ activeTab }) {
     setScanLocked(false)
   }
 
-  // DRAG DROP (image only)
+  // DRAG DROP
   const handleDrop = (e) => {
 
     e.preventDefault()
@@ -122,6 +124,33 @@ function UploadBox({ activeTab }) {
     }
   }
 
+  // LINK SCAN
+  const handleLinkScan = async () => {
+
+    if (!linkValue) {
+      alert("Please enter a link first")
+      return
+    }
+
+    try {
+
+      setIsScanning(true)
+      setScanResult(null)
+      const result = await analyzeLink(linkValue)
+      console.log("Link result:", result)
+      setScanResult(result)
+
+    } catch (error) {
+
+      console.error("Link scan failed:", error)
+
+    } finally {
+
+      setIsScanning(false)
+
+    }
+  }
+
   // =========================
   // LINK TAB
   // =========================
@@ -129,22 +158,30 @@ function UploadBox({ activeTab }) {
   if (activeTab === "link") {
 
     return (
-      <div className="upload-box">
+      <>
+        <div className="upload-box">
 
-        <h3>Paste a suspicious link</h3>
+          <h3>Paste a suspicious link</h3>
 
-        <input
-          type="text"
-          value={linkValue}
-          onChange={(e) => setLinkValue(e.target.value)}
-          placeholder="https://suspicious-link.com..."
-        />
+          <input
+            type="text"
+            value={linkValue}
+            onChange={(e) => setLinkValue(e.target.value)}
+            placeholder="https://suspicious-link.com..."
+          />
 
-        <button className="scan-btn">
-          Check Link
-        </button>
+          <button
+            className="scan-btn"
+            onClick={handleLinkScan}
+            disabled={isScanning}
+          >
+            {isScanning ? "Checking..." : "Check Link"}
+          </button>
 
-      </div>
+        </div>
+
+        {scanResult && <ResultPanel result={scanResult} />}
+      </>
     )
   }
 

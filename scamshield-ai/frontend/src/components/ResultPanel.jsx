@@ -1,7 +1,6 @@
 function ResultPanel({ result }) {
-
-  if (!result?.analysis) return null
-  const risk_score = result?.analysis?.risk_score ?? 0
+  if (!result) return null
+  const risk_score = result?.analysis?.risk_score ?? result?.risk_score ?? 0
 
   const riskScore = risk_score.toFixed(1)
   const safeScore = (10 - risk_score).toFixed(1)

@@ -35,3 +35,5 @@ node_modules
 .vite
 dist
 .env
+
+backend/temp/
